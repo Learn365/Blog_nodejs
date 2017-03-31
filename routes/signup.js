@@ -5,10 +5,10 @@ var checkNotLogin = require("../middlewares/check").checkNotLogin;
 
 // GET /signup signup view
 router.get("/", checkNotLogin, function(req, res, next) {
-    res.send(req.flash());
+    res.render("signup");
 });
 
-// POST /sigup signup
+// POST /signup signup
 router.post("/", checkNotLogin, function(req, res, next) {
     res.send(req.flash());
 });

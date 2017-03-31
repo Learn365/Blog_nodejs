@@ -31,17 +31,32 @@ app.use(session({
     })
 }));
 
+// config error middlewares
+// app.use(function(err, req, res, next) {
+//     console.error(err.stack);
+//     res.status(500).send("500: Internal Error, " + err.message);
+// });
+
 // config flash middlewares
 app.use(flash());
 
+// config global variables
+app.locals.blog = {
+
+    title: pkg.name,
+    description: pkg.description
+};
+
+// config required variables into templates
+app.use(function(req, res, next) {
+    res.locals.user = req.session.user;
+    res.locals.success = req.flash("success").toString();
+    res.locals.error = req.flash("error").toString();
+    next();
+});
+
 // config router
 routes(app);
-
-// config error middlewares
-app.use(function(err, req, res, next) {
-    console.error(err.stack);
-    res.status(500).send("500: Internal Error, " + err.message);
-});
 
 app.listen(config.port, function() {
     console.log(`${pkg.name} listening on port ${config.port}`);
