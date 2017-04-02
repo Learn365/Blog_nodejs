@@ -2,8 +2,11 @@
 
     <div class="ui grid">
         <div class="four wide column">
-            <a href="/posts?author=<%= user._id %>" class="avatar" data-tile="<%= user.name %> | <%= ({m:'Male',f:'Female',x:'Secrect'})[user.gender]%>" data-content="<%= user.bio %>">
-             <img src="/img/<%= user.avatar%>" alt="avatar" class="avatar">
+            <a href="/posts?author=<%= user._id %>" 
+                class="avatar" 
+                data-title="<%= user.name %> | <%= ({m:'Male',f:'Female',x:'Secret'})[user.gender]%>" 
+                data-content="<%= user.bio %>">
+             <img src="/img/<%= user.avatar%>" class="avatar">
              </a>
         </div>
 
