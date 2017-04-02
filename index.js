@@ -40,6 +40,11 @@ app.use(session({
 // config flash middlewares
 app.use(flash());
 
+app.use(require("express-formidable")({
+    uploadDir: path.join(__dirname, "public/img"),
+    keepExtensions: true // keep file extension
+}));
+
 // config global variables
 app.locals.blog = {
 

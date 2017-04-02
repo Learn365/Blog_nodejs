@@ -5,8 +5,12 @@ var checkLogin = require("../middlewares/check").checkLogin;
 
 // GET /signout sign out
 router.get("/", checkLogin, function(req, res, next) {
-    res.send(req.flash());
-});
 
+    // clean out user in the session
+    req.session.user = null;
+    req.flash("success", "Have a good day");
+    // direct to home page
+    res.redirect("/posts");
+});
 
 module.exports = router;
