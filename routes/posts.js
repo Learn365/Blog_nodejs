@@ -12,7 +12,7 @@ router.get("/", function(req, res, next) {
 
     PostModel.getPosts(author)
         .then(function(result) {
-            res.render("posts", { posts: result[0] });
+            res.render("posts", { posts: result && result.length > 0 ? result[0] : [] });
         })
         .catch(next);
 });
@@ -83,17 +83,51 @@ router.get("/:postId", function(req, res, next) {
 
 // GET /posts/:postId/edit post edit view
 router.get("/:postId/edit", checkLogin, function(req, res, next) {
-    res.send(req.flash());
+    var postId = req.params.postId;
+    var author = req.session.user._id;
+
+    PostModel.getRawPostById(postId)
+        .then(function(post) {
+            if (!post) {
+                throw new Error("The post dosen't exist");
+            }
+            if (author.toString() !== post.author._id.toString()) {
+                throw new Error("The access limited");
+            }
+            res.render("edit", {
+                post: post
+            });
+        })
+        .catch(next);
 });
 
 // POST /posts/:postId/edit save post
 router.post("/:postId/edit", checkLogin, function(req, res, next) {
-    res.send(req.flash());
+    var postId = req.params.postId;
+    var author = req.session.user._id;
+    var title = req.fields.title;
+    var content = req.fields.content;
+
+    PostModel.updatePostById(postId, author, { title: title, content: content })
+        .then(function() {
+            req.flash("success", "Updated successfully");
+            // redirect to the last page
+            res.redirect(`/posts/${postId}`);
+        })
+        .catch(next);
 });
 
 // GET /posts/:postId/remove delete a post
 router.get("/:postId/remove", function(req, res, next) {
-    res.send(req.flash());
+    var postId = req.params.postId;
+    var author = req.session.user._id;
+
+    PostModel.delPostById(postId, author)
+        .then(function() {
+            req.flash("success", "Deleted Successfully");
+            // redirect to the home page
+            res.redirect("/posts");
+        }).catch(next);
 });
 
 // POST /posts/:postId/comment submit a comment
