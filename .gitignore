@@ -2,4 +2,4 @@ cnofig/*
 !config/default.*
 npm-default.log
 # node_modules
-converage
+coverage
