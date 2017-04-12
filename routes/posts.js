@@ -2,6 +2,7 @@ var express = require("express");
 var router = express.Router();
 
 var PostModel = require("../models/posts");
+var CommentModel = require("../models/comments");
 var checkLogin = require("../middlewares/check").checkLogin;
 
 // Get /posts the articals of all users
@@ -66,16 +67,19 @@ router.get("/:postId", function(req, res, next) {
 
     Promise.all([
             PostModel.getPostById(postId), //get a post
+            CommentModel.getComments(postId), // get all of the comments of the post
             PostModel.incPv(postId) // pv increase of 1
         ])
         .then(function(result) {
             var post = result[0];
+            var comments = result[1];
             if (!post) {
                 throw new Error("the post dosen't exist");
             }
 
             res.render("post", {
-                post: post
+                post: post,
+                comments: comments
             });
         })
         .catch(next);
@@ -132,12 +136,36 @@ router.get("/:postId/remove", function(req, res, next) {
 
 // POST /posts/:postId/comment submit a comment
 router.post("/:postId/comment", checkLogin, function(req, res, next) {
-    res.send(req.flash());
+    var author = req.session.user._id;
+    var postId = req.params.postId;
+    var content = req.fields.content;
+    var comment = {
+        author: author,
+        postId: postId,
+        content: content
+    };
+
+    CommentModel.create(comment)
+        .then(function() {
+            req.flash("success", "Commented");
+            // redirect to back when commented
+            res.redirect("back");
+        })
+        .catch(next);
 });
 
 // GET /posts/:postId/comment/:commentId/remove delete a comment
 router.get("/:postId/comment/:commentId/remove", checkLogin, function(req, res, next) {
-    res.send(req.flash());
+    var commentId = req.params.commentId;
+    var author = req.session.user._id;
+
+    CommentModel.delCommentById(commentId, author)
+        .then(function() {
+            req.flash("success", "Removed the comment");
+            // redirect to back when removed the comment
+            res.redirect("back");
+        })
+        .catch(next);
 });
 
 module.exports = router;

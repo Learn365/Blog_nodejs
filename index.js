@@ -31,12 +31,6 @@ app.use(session({
     })
 }));
 
-// config error middlewares
-// app.use(function(err, req, res, next) {
-//     console.error(err.stack);
-//     res.status(500).send("500: Internal Error, " + err.message);
-// });
-
 // config flash middlewares
 app.use(flash());
 
@@ -62,6 +56,13 @@ app.use(function(req, res, next) {
 
 // config router
 routes(app);
+
+// error page
+app.use(function(err, req, res, next) {
+    res.render("error", {
+        error: err
+    });
+});
 
 app.listen(config.port, function() {
     console.log(`${pkg.name} listening on port ${config.port}`);
